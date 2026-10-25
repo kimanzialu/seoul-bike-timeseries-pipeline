@@ -1,0 +1,18 @@
+{
+  _id: ObjectId('6ade7817be1f2ec5d6114dbb'),
+  timestamp: ISODate('2018-06-03T15:00:00.000Z'),
+  rented_bike_count: NumberInt('1556'),
+  season: 'Summer',
+  holiday: 'No Holiday',
+  functioning_day: 'Yes',
+  weather: {
+    temperature_c: Double('30.7'),
+    humidity_pct: NumberInt('21'),
+    wind_speed_ms: Double('2.5'),
+    visibility_10m: NumberInt('1876'),
+    dew_point_c: Double('5.8'),
+    solar_radiation: Double('2.95'),
+    rainfall_mm: Double('0'),
+    snowfall_cm: Double('0')
+  }
+}
