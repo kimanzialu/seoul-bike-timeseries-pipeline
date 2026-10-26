@@ -1,6 +1,9 @@
 pandas
-sqlalchemy
-pymysql
+SQLAlchemy
+PyMySQL
 cryptography
 pymongo
 python-dotenv
+fastapi
+uvicorn[standard]
+httpx
