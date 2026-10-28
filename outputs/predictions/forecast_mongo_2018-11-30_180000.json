@@ -1,0 +1,49 @@
+{
+  "source": "mongo",
+  "forecast_timestamp": "2018-11-30 18:00:00",
+  "predicted_rented_bike_count": 1387.06,
+  "history_window": {
+    "start": "2018-11-23 18:00:00",
+    "end": "2018-11-30 17:00:00"
+  },
+  "preprocessing_report": {
+    "records_received": 168,
+    "duplicates_removed": 0,
+    "missing_hours": [],
+    "weather_values_filled": 0,
+    "clean_rows": 168,
+    "history_start": "2018-11-23 18:00:00",
+    "history_end": "2018-11-30 17:00:00"
+  },
+  "features": {
+    "hour": 18.0,
+    "day_of_week": 4.0,
+    "month": 11.0,
+    "is_weekend": 0.0,
+    "hour_sin": -1.0,
+    "hour_cos": -0.0,
+    "lag_1h": 1047.0,
+    "lag_24h": 1577.0,
+    "lag_168h": 1548.0,
+    "rolling_mean_24h": 693.9167,
+    "rolling_mean_168h": 598.2976,
+    "rolling_std_24h": 367.6046,
+    "temperature_lag_1h": 6.0,
+    "humidity_lag_1h": 29.0,
+    "rainfall_lag_1h": 0.0
+  },
+  "model": {
+    "file": "seoul_bike_rf_one_hour.joblib",
+    "hyperparameters": {
+      "n_estimators": 140,
+      "max_depth": 14,
+      "min_samples_leaf": 2,
+      "random_state": 42,
+      "n_jobs": -1
+    },
+    "test_mae": 69.48656950514919
+  },
+  "generated_at": "2026-10-28T19:02:43",
+  "actual_rented_bike_count": 1384,
+  "absolute_error": 3.06
+}
