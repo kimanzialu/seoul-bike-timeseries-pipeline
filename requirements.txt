@@ -7,3 +7,6 @@ python-dotenv
 fastapi
 uvicorn[standard]
 httpx
+numpy
+scikit-learn
+joblib
