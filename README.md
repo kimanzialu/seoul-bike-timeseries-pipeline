@@ -83,7 +83,54 @@ The API should be available at:
 | PUT | `/api/mongo/bikes/{record_id}` | Update a record |
 | DELETE | `/api/mongo/bikes/{record_id}` | Delete a record |
 
-## Testing
+## Forecasting Script — Task 4
+
+`forecasting/predict.py` runs the whole pipeline in one command:
+
+1. **Fetch.** It calls `GET /latest`, then `GET /range` on the API to pull the last 168 hourly records (one week, the longest lag the model uses). Pass `--source sql` for MySQL or `--source mongo` for MongoDB.
+2. **Preprocess.** It applies the Task 1 cleaning checks (required fields, timestamp parsing, non-negative target, duplicate removal, a continuous hourly grid) and then builds features with the same `make_forecasting_features` function used in training: calendar and cyclical hour features, 1h/24h/168h lags, 24h/168h past-only moving averages, and the previous hour's weather.
+3. **Load the model.** It loads `models/seoul_bike_rf_one_hour.joblib` and checks that the feature columns match.
+4. **Predict.** It forecasts `rented_bike_count` for the next hour, prints the result and saves a JSON report to `outputs/predictions/`.
+
+With the API running:
+
+```bash
+python -m forecasting.predict                            # next hour after the latest record (MySQL)
+python -m forecasting.predict --source mongo             # same, through MongoDB
+python -m forecasting.predict --at "2018-11-30 18:00"    # backtest: forecast a known hour and show the error
+```
+
+Example output:
+
+```text
+[1/4] Fetching history from the MONGO API: 2018-11-23 18:00:00 -> 2018-11-30 17:00:00
+      received 168 records
+[2/4] Preprocessing (Task 1 cleaning + lag / rolling-mean features)
+[3/4] Loading model: seoul_bike_rf_one_hour.joblib
+[4/4] Forecast for 2018-11-30 18:00: 1387 bikes rented
+      actual: 1384  |  absolute error: 3
+```
+
+**Missing data.** The original dataset has no missing hours, but CRUD deletes can leave gaps. Up to 3 missing hours (change with `--max-gap-fill`) are filled by time interpolation, and the filled hours are listed in the JSON report. With more gaps than that, the script stops instead of feeding invented history to the lag features.
+
+**Model file.** If `models/seoul_bike_rf_one_hour.joblib` is missing, copy in the one saved by the Task 1 notebook or rebuild it from the CSV with the same experiments (RF_1–RF_3, TimeSeriesSplit, selected by CV MAE):
+
+```bash
+python -m forecasting.train_model
+```
+
+### Tests
+
+The tests run the real FastAPI routes against in-memory SQLite and mongomock, so neither database needs to be running:
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests
+```
+
+They check that prediction-time features match the training features exactly, that the pipeline runs end to end through both the SQL and MongoDB APIs, that the two APIs give the same forecast, and that records deleted through the API are handled.
+
+## Testing the API
 
 1. Start the API server.
 2. Open `http://127.0.0.1:8000/docs` in your browser.
@@ -104,8 +151,17 @@ database/
   loaders/
   mongo/
   sql/
+forecasting/          # Task 4
+  api_client.py       # calls the SQL / MongoDB API endpoints
+  preprocessing.py    # Task 1 cleaning + feature engineering (shared by train & predict)
+  train_model.py      # rebuilds the model bundle from the CSV
+  predict.py          # end-to-end forecast script
+models/               # trained model (joblib)
+outputs/predictions/  # JSON forecast reports
+tests/                # end-to-end tests for Task 4
 data/
 requirements.txt
+requirements-dev.txt
 .env.example
 README.md
 ```
